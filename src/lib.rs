@@ -1,75 +1,104 @@
-
-pub trait FadNodeComponent: Sized {
-    fn add(self, rhs: Self) -> Self;
-    fn sub(self, rhs: Self) -> Self;
-}
-
-impl FadNodeComponent for f32 {
-    fn add(self, rhs: Self) -> Self {
-        self + rhs
-    }
-    fn sub(self, rhs: Self) -> Self {
-        self - rhs
-    }
-}
-impl FadNodeComponent for f64 {
-    fn add(self, rhs: Self) -> Self {
-        self + rhs
-    }
-    fn sub(self, rhs: Self) -> Self {
-        self - rhs
-    }
-}
+use num::Num;
 
 #[derive(Copy, Clone)]
-pub struct ForwardADNode<C: FadNodeComponent> {
+pub struct ForwardADNode<C: Num> {
     order0: C,
     order1: C,
 }
 
-impl<C: FadNodeComponent> std::ops::Add<ForwardADNode<C>> for ForwardADNode<C> {
+impl<C: Num> std::ops::Add<ForwardADNode<C>> for ForwardADNode<C> {
     type Output = ForwardADNode<C>;
 
     fn add(self, rhs: ForwardADNode<C>) -> ForwardADNode<C> {
         ForwardADNode {
-            order0: self.order0.add(rhs.order0),
-            order1: self.order1.add(rhs.order1),
+            order0: self.order0 + rhs.order0,
+            order1: self.order1 + rhs.order1,
         }
     }
 }
-impl<C: FadNodeComponent> std::ops::Sub<ForwardADNode<C>> for ForwardADNode<C> {
+impl<C: Num> std::ops::Sub<ForwardADNode<C>> for ForwardADNode<C> {
     type Output = ForwardADNode<C>;
 
     fn sub(self, rhs: ForwardADNode<C>) -> ForwardADNode<C> {
         ForwardADNode {
-            order0: self.order0.sub(rhs.order0),
-            order1: self.order1.sub(rhs.order1),
+            order0: self.order0 - rhs.order0,
+            order1: self.order1 - rhs.order1,
         }
     }
 }
 
-impl<C: FadNodeComponent> std::ops::Add<C> for ForwardADNode<C> {
+impl<C: Num> std::ops::Add<C> for ForwardADNode<C> {
     type Output = ForwardADNode<C>;
 
     fn add(self, rhs: C) -> ForwardADNode<C> {
         ForwardADNode {
-            order0: self.order0.add(rhs),
+            order0: self.order0 + rhs,
             order1: self.order1,
         }
     }
 }
-impl<C: FadNodeComponent> std::ops::Sub<C> for ForwardADNode<C> {
+impl<C: Num> std::ops::Sub<C> for ForwardADNode<C> {
     type Output = ForwardADNode<C>;
 
     fn sub(self, rhs: C) -> ForwardADNode<C> {
         ForwardADNode {
-            order0: self.order0.sub(rhs),
+            order0: self.order0 - rhs,
             order1: self.order1,
         }
     }
 }
 
+//impl<C: Num> std::ops::Sub<ForwardADNode<C>> for C {
+//    type Output = ForwardADNode<C>;
+//
+//    fn sub(self, rhs: C) -> ForwardADNode<C> {
+//        ForwardADNode {
+//            order0: self.order0 - rhs,
+//            order1: self.order1,
+//        }
+//    }
+//}
 
+impl std::ops::Sub<ForwardADNode<f32>> for f32 {
+    type Output = ForwardADNode<f32>;
+
+    fn sub(self, rhs: ForwardADNode<f32>) -> ForwardADNode<f32> {
+        ForwardADNode {
+            order0: self - rhs.order0,
+            order1: -rhs.order1,
+        }
+    }
+}
+impl std::ops::Sub<ForwardADNode<f64>> for f64 {
+    type Output = ForwardADNode<f64>;
+
+    fn sub(self, rhs: ForwardADNode<f64>) -> ForwardADNode<f64> {
+        ForwardADNode {
+            order0: self - rhs.order0,
+            order1: -rhs.order1,
+        }
+    }
+}
+impl std::ops::Add<ForwardADNode<f32>> for f32 {
+    type Output = ForwardADNode<f32>;
+
+    fn add(self, rhs: ForwardADNode<f32>) -> ForwardADNode<f32> {
+        ForwardADNode {
+            order0: self + rhs.order0,
+            order1: rhs.order1,
+        }
+    }
+}
+impl std::ops::Add<ForwardADNode<f64>> for f64 {
+    type Output = ForwardADNode<f64>;
+
+    fn add(self, rhs: ForwardADNode<f64>) -> ForwardADNode<f64> {
+        ForwardADNode {
+            order0: self + rhs.order0,
+            order1: rhs.order1,
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -109,7 +138,7 @@ mod tests {
         }
         {
             let c = a - 1.1f32;
-            assert_releq!(c.order0, 1.3_f32, 1e-5);
+            assert_releq!(c.order0, 0.1_f32, 1e-5);
             assert_releq!(c.order1, 2.3_f32, 1e-5);
         }
         {
@@ -117,6 +146,11 @@ mod tests {
             assert_releq!(c.order0, 0.1_f32, 1e-5);
             assert_releq!(c.order1, 2.3_f32, 1e-5);
             
+        }
+        {
+            let c = 1.1f32 - a;
+            assert_releq!(c.order0, -0.1_f32, 1e-5);
+            assert_releq!(c.order1, -2.3_f32, 1e-5);
         }
     }
 }
