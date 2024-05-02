@@ -1,183 +1,202 @@
-use num::Num;
 
-#[derive(Copy, Clone)]
-pub struct ForwardADNode<C: Num> {
-    order0: C,
-    order1: C,
-}
+pub mod node
+{
+    use num::{Num, Float};
+    #[derive(Copy, Clone)]
+    pub struct ForwardADNode<C: Num> {
+        pub order0: C,
+        pub order1: C,
+    }
 
-impl<C: Num> std::ops::Add<ForwardADNode<C>> for ForwardADNode<C> {
-    type Output = ForwardADNode<C>;
+    impl<C: Num> std::ops::Add<ForwardADNode<C>> for ForwardADNode<C> {
+        type Output = ForwardADNode<C>;
 
-    fn add(self, rhs: ForwardADNode<C>) -> ForwardADNode<C> {
-        ForwardADNode {
-            order0: self.order0 + rhs.order0,
-            order1: self.order1 + rhs.order1,
+        fn add(self, rhs: ForwardADNode<C>) -> ForwardADNode<C> {
+            ForwardADNode {
+                order0: self.order0 + rhs.order0,
+                order1: self.order1 + rhs.order1,
+            }
         }
     }
-}
-impl<C: Num> std::ops::Sub<ForwardADNode<C>> for ForwardADNode<C> {
-    type Output = ForwardADNode<C>;
+    impl<C: Num> std::ops::Sub<ForwardADNode<C>> for ForwardADNode<C> {
+        type Output = ForwardADNode<C>;
 
-    fn sub(self, rhs: ForwardADNode<C>) -> ForwardADNode<C> {
-        ForwardADNode {
-            order0: self.order0 - rhs.order0,
-            order1: self.order1 - rhs.order1,
+        fn sub(self, rhs: ForwardADNode<C>) -> ForwardADNode<C> {
+            ForwardADNode {
+                order0: self.order0 - rhs.order0,
+                order1: self.order1 - rhs.order1,
+            }
         }
     }
-}
 
-impl<C: Num> std::ops::Add<C> for ForwardADNode<C> {
-    type Output = ForwardADNode<C>;
+    impl<C: Num> std::ops::Add<C> for ForwardADNode<C> {
+        type Output = ForwardADNode<C>;
 
-    fn add(self, rhs: C) -> ForwardADNode<C> {
-        ForwardADNode {
-            order0: self.order0 + rhs,
-            order1: self.order1,
+        fn add(self, rhs: C) -> ForwardADNode<C> {
+            ForwardADNode {
+                order0: self.order0 + rhs,
+                order1: self.order1,
+            }
         }
     }
-}
-impl<C: Num> std::ops::Sub<C> for ForwardADNode<C> {
-    type Output = ForwardADNode<C>;
+    impl<C: Num> std::ops::Sub<C> for ForwardADNode<C> {
+        type Output = ForwardADNode<C>;
 
-    fn sub(self, rhs: C) -> ForwardADNode<C> {
-        ForwardADNode {
-            order0: self.order0 - rhs,
-            order1: self.order1,
+        fn sub(self, rhs: C) -> ForwardADNode<C> {
+            ForwardADNode {
+                order0: self.order0 - rhs,
+                order1: self.order1,
+            }
         }
     }
-}
-impl<C: Num + Copy> std::ops::Mul<C> for ForwardADNode<C> {
-    type Output = ForwardADNode<C>;
+    impl<C: Num + Copy> std::ops::Mul<C> for ForwardADNode<C> {
+        type Output = ForwardADNode<C>;
 
-    fn mul(self, rhs: C) -> ForwardADNode<C> {
-        ForwardADNode {
-            order0: self.order0 * rhs,
-            order1: self.order1 * rhs,
+        fn mul(self, rhs: C) -> ForwardADNode<C> {
+            ForwardADNode {
+                order0: self.order0 * rhs,
+                order1: self.order1 * rhs,
+            }
         }
     }
-}
-impl<C: Num + Copy> std::ops::Div<C> for ForwardADNode<C> {
-    type Output = ForwardADNode<C>;
+    impl<C: Num + Copy> std::ops::Div<C> for ForwardADNode<C> {
+        type Output = ForwardADNode<C>;
 
-    fn div(self, rhs: C) -> ForwardADNode<C> {
-        ForwardADNode {
-            order0: self.order0 / rhs,
-            order1: self.order1 / rhs,
+        fn div(self, rhs: C) -> ForwardADNode<C> {
+            ForwardADNode {
+                order0: self.order0 / rhs,
+                order1: self.order1 / rhs,
+            }
         }
     }
-}
 
-impl<C: Num + Copy> std::ops::Mul<ForwardADNode<C>> for ForwardADNode<C> {
-    type Output = ForwardADNode<C>;
+    impl<C: Num + Copy> std::ops::Mul<ForwardADNode<C>> for ForwardADNode<C> {
+        type Output = ForwardADNode<C>;
 
-    fn mul(self, rhs: ForwardADNode<C>) -> ForwardADNode<C> {
-        ForwardADNode {
-            order0: self.order0 * rhs.order0,
-            order1: self.order1 * rhs.order0 + rhs.order1 * self.order0,
+        fn mul(self, rhs: ForwardADNode<C>) -> ForwardADNode<C> {
+            ForwardADNode {
+                order0: self.order0 * rhs.order0,
+                order1: self.order1 * rhs.order0 + rhs.order1 * self.order0,
+            }
         }
     }
-}
-impl<C: Num + Copy> std::ops::Div<ForwardADNode<C>> for ForwardADNode<C> {
-    type Output = ForwardADNode<C>;
+    impl<C: Num + Copy> std::ops::Div<ForwardADNode<C>> for ForwardADNode<C> {
+        type Output = ForwardADNode<C>;
 
-    fn div(self, rhs: ForwardADNode<C>) -> ForwardADNode<C> {
-        ForwardADNode {
-            order0: self.order0 / rhs.order0,
-            order1: (self.order1 * rhs.order0 - rhs.order1 * self.order0) / rhs.order0 / rhs.order0,
+        fn div(self, rhs: ForwardADNode<C>) -> ForwardADNode<C> {
+            ForwardADNode {
+                order0: self.order0 / rhs.order0,
+                order1: (self.order1 * rhs.order0 - rhs.order1 * self.order0) / rhs.order0 / rhs.order0,
+            }
         }
     }
-}
 
-//impl<C: Num> std::ops::Sub<ForwardADNode<C>> for C {
-//    type Output = ForwardADNode<C>;
-//
-//    fn sub(self, rhs: C) -> ForwardADNode<C> {
-//        ForwardADNode {
-//            order0: self.order0 - rhs,
-//            order1: self.order1,
-//        }
-//    }
-//}
+    //impl<C: Num> std::ops::Sub<ForwardADNode<C>> for C {
+    //    type Output = ForwardADNode<C>;
+    //
+    //    fn sub(self, rhs: C) -> ForwardADNode<C> {
+    //        ForwardADNode {
+    //            order0: self.order0 - rhs,
+    //            order1: self.order1,
+    //        }
+    //    }
+    //}
 
-impl std::ops::Sub<ForwardADNode<f32>> for f32 {
-    type Output = ForwardADNode<f32>;
+    impl std::ops::Sub<ForwardADNode<f32>> for f32 {
+        type Output = ForwardADNode<f32>;
 
-    fn sub(self, rhs: ForwardADNode<f32>) -> ForwardADNode<f32> {
-        ForwardADNode {
-            order0: self - rhs.order0,
-            order1: -rhs.order1,
+        fn sub(self, rhs: ForwardADNode<f32>) -> ForwardADNode<f32> {
+            ForwardADNode {
+                order0: self - rhs.order0,
+                order1: -rhs.order1,
+            }
         }
     }
-}
-impl std::ops::Sub<ForwardADNode<f64>> for f64 {
-    type Output = ForwardADNode<f64>;
+    impl std::ops::Sub<ForwardADNode<f64>> for f64 {
+        type Output = ForwardADNode<f64>;
 
-    fn sub(self, rhs: ForwardADNode<f64>) -> ForwardADNode<f64> {
-        ForwardADNode {
-            order0: self - rhs.order0,
-            order1: -rhs.order1,
+        fn sub(self, rhs: ForwardADNode<f64>) -> ForwardADNode<f64> {
+            ForwardADNode {
+                order0: self - rhs.order0,
+                order1: -rhs.order1,
+            }
         }
     }
-}
-impl std::ops::Add<ForwardADNode<f32>> for f32 {
-    type Output = ForwardADNode<f32>;
+    impl std::ops::Add<ForwardADNode<f32>> for f32 {
+        type Output = ForwardADNode<f32>;
 
-    fn add(self, rhs: ForwardADNode<f32>) -> ForwardADNode<f32> {
-        ForwardADNode {
-            order0: self + rhs.order0,
-            order1: rhs.order1,
+        fn add(self, rhs: ForwardADNode<f32>) -> ForwardADNode<f32> {
+            ForwardADNode {
+                order0: self + rhs.order0,
+                order1: rhs.order1,
+            }
         }
     }
-}
-impl std::ops::Add<ForwardADNode<f64>> for f64 {
-    type Output = ForwardADNode<f64>;
+    impl std::ops::Add<ForwardADNode<f64>> for f64 {
+        type Output = ForwardADNode<f64>;
 
-    fn add(self, rhs: ForwardADNode<f64>) -> ForwardADNode<f64> {
-        ForwardADNode {
-            order0: self + rhs.order0,
-            order1: rhs.order1,
+        fn add(self, rhs: ForwardADNode<f64>) -> ForwardADNode<f64> {
+            ForwardADNode {
+                order0: self + rhs.order0,
+                order1: rhs.order1,
+            }
         }
     }
-}
 
-impl std::ops::Div<ForwardADNode<f32>> for f32 {
-    type Output = ForwardADNode<f32>;
+    impl std::ops::Div<ForwardADNode<f32>> for f32 {
+        type Output = ForwardADNode<f32>;
 
-    fn div(self, rhs: ForwardADNode<f32>) -> ForwardADNode<f32> {
-        ForwardADNode {
-            order0: self / rhs.order0,
-            order1: - self * rhs.order1 / rhs.order0.powi(2),
+        fn div(self, rhs: ForwardADNode<f32>) -> ForwardADNode<f32> {
+            ForwardADNode {
+                order0: self / rhs.order0,
+                order1: - self * rhs.order1 / rhs.order0.powi(2),
+            }
         }
     }
-}
-impl std::ops::Div<ForwardADNode<f64>> for f64 {
-    type Output = ForwardADNode<f64>;
+    impl std::ops::Div<ForwardADNode<f64>> for f64 {
+        type Output = ForwardADNode<f64>;
 
-    fn div(self, rhs: ForwardADNode<f64>) -> ForwardADNode<f64> {
-        ForwardADNode {
-            order0: self / rhs.order0,
-            order1: - self * rhs.order1 / rhs.order0.powi(2),
+        fn div(self, rhs: ForwardADNode<f64>) -> ForwardADNode<f64> {
+            ForwardADNode {
+                order0: self / rhs.order0,
+                order1: - self * rhs.order1 / rhs.order0.powi(2),
+            }
         }
     }
-}
-impl std::ops::Mul<ForwardADNode<f32>> for f32 {
-    type Output = ForwardADNode<f32>;
+    impl std::ops::Mul<ForwardADNode<f32>> for f32 {
+        type Output = ForwardADNode<f32>;
 
-    fn mul(self, rhs: ForwardADNode<f32>) -> ForwardADNode<f32> {
-        ForwardADNode {
-            order0: self * rhs.order0,
-            order1: self * rhs.order1,
+        fn mul(self, rhs: ForwardADNode<f32>) -> ForwardADNode<f32> {
+            ForwardADNode {
+                order0: self * rhs.order0,
+                order1: self * rhs.order1,
+            }
         }
     }
-}
-impl std::ops::Mul<ForwardADNode<f64>> for f64 {
-    type Output = ForwardADNode<f64>;
+    impl std::ops::Mul<ForwardADNode<f64>> for f64 {
+        type Output = ForwardADNode<f64>;
 
-    fn mul(self, rhs: ForwardADNode<f64>) -> ForwardADNode<f64> {
-        ForwardADNode {
-            order0: self * rhs.order0,
-            order1: self * rhs.order1,
+        fn mul(self, rhs: ForwardADNode<f64>) -> ForwardADNode<f64> {
+            ForwardADNode {
+                order0: self * rhs.order0,
+                order1: self * rhs.order1,
+            }
+        }
+    }
+
+    impl<T: Num + Copy + Float> ForwardADNode<T>
+    {
+        pub fn cos(self) -> ForwardADNode<T>
+        {
+            ForwardADNode{order0: self.order0.cos(), order1: -self.order1 * self.order0.sin()}
+        }
+        pub fn sin(self) -> ForwardADNode<T>
+        {
+            ForwardADNode{order0: self.order0.sin(), order1: self.order1 * self.order0.cos()}
+        }
+        pub fn exp(self) -> ForwardADNode<T>
+        {
+            ForwardADNode{order0: self.order0.exp(), order1: self.order1 * self.order0.exp()}
         }
     }
 }
@@ -185,6 +204,7 @@ impl std::ops::Mul<ForwardADNode<f64>> for f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::node::ForwardADNode;
     macro_rules! assert_releq {
         ($x:expr, $y:expr, $tol:expr) => {
             let mean = ($x + $y) / 2.0;

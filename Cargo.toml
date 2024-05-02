@@ -1,5 +1,5 @@
 [package]
-name = "small_physics_lib"
+name = "fad"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,7 +7,14 @@ edition = "2021"
 
 [dependencies]
 num = "0.4.1"
+rand_pcg = "*"
+rand = "*"
+rand_distr = "*"
 
 [lib]
 name = "fad"
 path = "src/fad.rs"
+
+[[bin]]
+name = "generate_ensemble_ho"
+path = "src/generate_ensemble_ho.rs"
