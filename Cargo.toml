@@ -17,5 +17,17 @@ name = "fad"
 path = "src/fad.rs"
 
 [[bin]]
-name = "generate_ensemble_ho"
-path = "src/generate_ensemble_ho.rs"
+name = "generate_ensemble_ho_noop"
+path = "src/generate_ensemble_ho_noop.rs"
+[[bin]]
+name = "generate_ensemble_cos_noop"
+path = "src/generate_ensemble_cos_noop.rs"
+[[bin]]
+name = "generate_ensemble_ho_recompactify"
+path = "src/generate_ensemble_ho_recompactify.rs"
+[[bin]]
+name = "generate_ensemble_cos_recompactify"
+path = "src/generate_ensemble_cos_recompactify.rs"
+
+[profile.release]
+opt-level = 3
