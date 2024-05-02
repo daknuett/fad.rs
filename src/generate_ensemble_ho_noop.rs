@@ -19,6 +19,7 @@ struct Cli
     n_sample: usize,
     nsteps_perunittime: u32,
     output_name: std::path::PathBuf,
+    eta_method: String,
 }
 
 fn main() -> Result<(), Box<dyn Error>>
@@ -36,13 +37,32 @@ fn main() -> Result<(), Box<dyn Error>>
 
     let mut x: ForwardADNode<f64> = ForwardADNode{order0: 0f64, order1: 0f64};
 
+    let eta_method = {
+        match args.eta_method.as_str()
+        {
+            "only0" => 0,
+            "independent" => 1,
+            "same" => 2,
+            _ => 0,
+        }
+    };
+
+
     for i in 0..args.n_sample
     {
         for _k in 0..args.nsteps_perunittime
         {
             x = x 
                 + eps * force(x, ForwardADNode{order0: args.beta, order1: 1f64}) 
-                + eps.sqrt() * distr.sample(&mut bit_generator);
+                + {
+                    match eta_method
+                    {
+                        0 => ForwardADNode{order0: eps.sqrt() * distr.sample(&mut bit_generator), order1: 0f64},
+                        1 => ForwardADNode{order0: eps.sqrt() * distr.sample(&mut bit_generator), order1: eps.sqrt() * distr.sample(&mut bit_generator)},
+                        2 => ForwardADNode{order0: 1f64, order1: 1f64} * eps.sqrt() * distr.sample(&mut bit_generator),
+                        _ => ForwardADNode{order0: eps.sqrt() * distr.sample(&mut bit_generator), order1: 0f64},
+                    }
+                    };
         }
         x0[i] = x.order0;
         x1[i] = x.order1;
