@@ -10,6 +10,7 @@ num = "0.4.1"
 rand_pcg = "*"
 rand = "*"
 rand_distr = "*"
+clap = { version = "4.5.4", features = ["derive"] }
 
 [lib]
 name = "fad"
