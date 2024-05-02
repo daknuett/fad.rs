@@ -17,9 +17,11 @@ struct Cli
 {
     beta: f64,
     n_sample: usize,
-    nsteps_perunittime: u32,
-    output_name: std::path::PathBuf,
+    eps: f64,
+    omega: f64,
+    alpha: f64,
     eta_method: String,
+    output_name: std::path::PathBuf,
 }
 
 fn main() -> Result<(), Box<dyn Error>>
@@ -30,7 +32,8 @@ fn main() -> Result<(), Box<dyn Error>>
 
     let args = Cli::parse();
 
-    let eps: f64 = 1.0 / (args.nsteps_perunittime as f64);
+    let n_tray = (1.0 / args.eps) as u32;
+    let eps = args.eps;
 
     let mut x0: Vec<f64> = vec![0.0; args.n_sample];
     let mut x1: Vec<f64> = vec![0.0; args.n_sample];
@@ -50,7 +53,7 @@ fn main() -> Result<(), Box<dyn Error>>
 
     for i in 0..args.n_sample
     {
-        for _k in 0..args.nsteps_perunittime
+        for _k in 0..n_tray
         {
             x = x 
                 + eps * force(x, ForwardADNode{order0: args.beta, order1: 1f64}) 
